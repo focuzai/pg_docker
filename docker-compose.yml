@@ -1,0 +1,19 @@
+version: '3.1'
+services:
+  db:
+    container_name: ${DB_HOST}
+    image: ${DB_IMAGE}
+    build: ./postgres
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWD}
+      - POSTGRES_USER=${DB_USER}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    command: -c shared_buffers=4096MB -c max_connections=200
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+    restart: always
+volumes:
+  odoo-db-data:
