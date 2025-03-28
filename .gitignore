@@ -1,5 +1,6 @@
 # Ignores the main configuration file.
-/.env
-/.env-*
+.env
+.env-*
+# Ignores the docker compose local or production environment.
 docker-compose.override.yml
 docker-compose-*
