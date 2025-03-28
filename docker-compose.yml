@@ -1,19 +1,32 @@
-version: '3.1'
 services:
-  db:
-    container_name: ${DB_HOST}
-    image: ${DB_IMAGE}
-    build: ./postgres
-    environment:
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_PASSWORD=${DB_PASSWD}
-      - POSTGRES_USER=${DB_USER}
-      - PGDATA=/var/lib/postgresql/data/pgdata
-    command: -c shared_buffers=4096MB -c max_connections=200
-    ports:
-      - "${DB_PORT}:5432"
+  postgres:
+    build: 
+      context: ./
+      dockerfile: ./postgres/Dockerfile
+      args:
+        - POSTGRES_TAG=${POSTGRES_TAG}
+        - LOAD_LANGUAGE
+    tty: true
     volumes:
-      - odoo-db-data:/var/lib/postgresql/data/pgdata
-    restart: always
+      - pg-data:${PGDATA}
+      - ./postgres/entrypoint.sh:/docker-entrypoint-initdb.d/entrypoint.sh
+    environment:
+      - POSTGRES_DB
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - PGDATA
+      - DB_USER
+      - DB_TEMPLATE
+      - UNACCENT_TEMPLATE
+      - PGADMING_DB_NAME
+      - PGADMING_DB_USER
+      - PGADMIN_DB_PASSWORD
+    networks:
+      - internal
+    profiles: [$POSTGRES_PROFILES]
 volumes:
-  odoo-db-data:
+  pg-data:
+
+networks:
+  internal:
+    driver: bridge

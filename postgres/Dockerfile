@@ -1,11 +1,28 @@
-FROM postgres:14.7
-LABEL MAINTAINER Harrison Chumpitaz <hchumpitaz92@gmail.com>
+ARG POSTGRES_TAG
+FROM postgres:${POSTGRES_TAG}
 
-USER root
-RUN localedef -i es_ES -c -f UTF-8 -A /usr/share/locale/locale.alias es_ES.UTF-8
+ARG LOAD_LANGUAGE
+ENV LOAD_LANGUAGE=${LOAD_LANGUAGE}
 
-ENV LANG es_ES.utf8
+#------------------------#
+#    APT Dependencies    #
+#------------------------#
+# Update apt packages
+RUN apt-get update && apt-get install -y \
+    # Unaccent extension dependencies
+    postgresql-contrib \
+    apt-utils \
+    # Clean up the apt cache to reduce the image size
+    && rm -rf /var/lib/apt/lists/*
 
-# COPY postgresql.conf /var/lib/postgresql/data/
-# COPY postgresql.conf.sample /usr/share/postgresql/
-COPY init.sql /docker-entrypoint-initdb.d/
+COPY --chown=postgres:postgres ./.env /
+COPY --chown=postgres:postgres ./postgres/odoo-users.txt /
+
+# Copy the script to create the unaccent template
+
+COPY ./postgres/entrypoint.sh /docker-entrypoint-initdb.d/entrypoint.sh
+
+# USER root
+RUN localedef -i ${LOAD_LANGUAGE} -c -f UTF-8 -A /usr/share/locale/locale.alias ${LOAD_LANGUAGE}.UTF-8
+
+ENV LANG ${LOAD_LANGUAGE}.utf8

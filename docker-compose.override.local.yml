@@ -1,0 +1,27 @@
+services:
+  postgres:
+    restart: always
+    ports:
+      - "${DB_PORT}:5432"
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+        reservations:
+          cpus: '2'
+          memory: 2G
+    environment:
+      # Optimización de PostgreSQL
+      - POSTGRES_SHARED_BUFFERS=1GB
+      - POSTGRES_EFFECTIVE_CACHE_SIZE=2GB
+      - POSTGRES_WORK_MEM=64MB
+      - POSTGRES_MAINTENANCE_WORK_MEM=256MB
+      - POSTGRES_MAX_CONNECTIONS=200
+      - POSTGRES_MAX_PARALLEL_WORKERS=2
+      - POSTGRES_MAX_WORKER_PROCESSES=2
+      - POSTGRES_MAX_WAL_SIZE=1GB
+      - POSTGRES_MIN_WAL_SIZE=512MB
+      - POSTGRES_CHECKPOINT_COMPLETION_TARGET=0.9
+      - POSTGRES_RANDOM_PAGE_COST=1.1
+      - POSTGRES_EFFECTIVE_IO_CONCURRENCY=200

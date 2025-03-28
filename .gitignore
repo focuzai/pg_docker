@@ -1,0 +1,5 @@
+# Ignores the main configuration file.
+/.env
+/.env-*
+docker-compose.override.yml
+docker-compose-*
