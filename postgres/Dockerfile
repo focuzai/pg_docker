@@ -1,4 +1,4 @@
-ARG POSTGRES_TAG
+ARG POSTGRES_TAG=latest
 FROM postgres:${POSTGRES_TAG}
 
 ARG LOAD_LANGUAGE
@@ -16,13 +16,11 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=postgres:postgres ./.env /
-COPY --chown=postgres:postgres ./postgres/odoo-users.txt /
 
 # Copy the script to create the unaccent template
-
 COPY ./postgres/entrypoint.sh /docker-entrypoint-initdb.d/entrypoint.sh
 
 # USER root
 RUN localedef -i ${LOAD_LANGUAGE} -c -f UTF-8 -A /usr/share/locale/locale.alias ${LOAD_LANGUAGE}.UTF-8
 
-ENV LANG ${LOAD_LANGUAGE}.utf8
+ENV LANG=${LOAD_LANGUAGE}.utf8
